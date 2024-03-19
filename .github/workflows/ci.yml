@@ -5,8 +5,6 @@ on:
     branches:
       - master
       - main
-      - develop
-  pull_request:
 
 jobs:
   ci:
@@ -21,28 +19,22 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Setup Node.js ${{ matrix.node }}
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node }}
-          cache: "yarn"
-
       - name: Install dependencies
-        run: yarn install --pure-lockfile --prefer-offline
+        run: npm install static-marks --cache .npm --prefer-offline
 
-      - name: Validate
-        run: yarn ci
-
-      - name: Build
-        run: yarn build
+      - name: build
+        run: |
+          mkdir -p public
+          ./node_modules/.bin/static-marks build bookmarks/*.yml > public/index.html
         
       - name: Setup Pages
         uses: actions/configure-pages@v4
+        
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           # Upload entire repository
-          path: 'build'
+          path: 'public'
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
